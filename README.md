@@ -186,9 +186,9 @@ The `tests/` directory contains verified input/output pairs:
 
 ---
 
-## Authors
+## Author
 
-COAL Lab Project — Computer Organization and Assembly Language
+Muhammad Abdullah Ismail
 
 ---
 
