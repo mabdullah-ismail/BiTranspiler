@@ -88,33 +88,7 @@ To **run the web GUI**, you need:
 
 ---
 
-## Setup & Running
 
-### Option 1: Web GUI (Recommended for Demo)
-
-```bash
-# 1. Navigate to the project folder
-cd "Coal Lab Project"
-
-# 2. Start the web server
-node server.js
-
-# 3. Open in browser
-# Visit http://localhost:3000
-```
-
-The web GUI lets you:
-- Write C++ code and transpile it to x86 MASM Assembly
-- Write MASM Assembly and recover the original C++ code
-- Compile and run C++ code with live output
-- Load pre-built example templates (Arithmetic, Factorial, Fibonacci)
-
-### Option 2: Command-Line Interface
-
-```bash
-# Run the CLI directly
-./BiTranspiler.exe
-```
 
 The CLI provides an interactive menu:
 1. **C++ --> Assembly** — Paste your C++ code, type `END` on a new line, get Assembly output
