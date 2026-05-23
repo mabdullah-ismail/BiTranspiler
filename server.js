@@ -2,12 +2,26 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const os = require('os');
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
+const IS_WINDOWS = os.platform() === 'win32';
 
-// Append Winget GCC path to dynamically find dlls in child processes
-const GCC_BIN_DIR = "C:\\Users\\RBTG V2\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.MCF.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin";
+// Binary names differ by platform
+const TRANSPILER_BIN = path.join(__dirname, IS_WINDOWS ? 'BiTranspiler.exe' : 'BiTranspiler');
+const TEMP_CPP = path.join(__dirname, 'temp_run.cpp');
+const TEMP_EXE = path.join(__dirname, IS_WINDOWS ? 'temp_run.exe' : 'temp_run');
+
+// On Windows, append the local GCC path so DLLs are found by child processes
+function getChildEnv() {
+    const env = { ...process.env };
+    if (IS_WINDOWS) {
+        const GCC_BIN_DIR = "C:\\Users\\RBTG V2\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.MCF.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin";
+        env.PATH = (env.PATH || '') + ';' + GCC_BIN_DIR;
+    }
+    return env;
+}
 
 const server = http.createServer((req, res) => {
     // 1. Static Files Serving
@@ -50,13 +64,8 @@ const server = http.createServer((req, res) => {
                 const code = payload.code || '';
                 const direction = payload.direction === 'cpp2asm' ? '--cpp2asm' : '--asm2cpp';
 
-                const exePath = path.join(__dirname, 'BiTranspiler.exe');
-                
-                // Set path env so GCC DLLs are found
-                const childEnv = { ...process.env };
-                childEnv.PATH = (childEnv.PATH || '') + ';' + GCC_BIN_DIR;
-
-                const child = spawn(exePath, [direction], { env: childEnv });
+                const childEnv = getChildEnv();
+                const child = spawn(TRANSPILER_BIN, [direction], { env: childEnv });
 
                 let stdoutData = '';
                 let stderrData = '';
@@ -113,15 +122,11 @@ const server = http.createServer((req, res) => {
                     return;
                 }
 
-                // Write code to a temp file
-                const tempCpp = path.join(__dirname, 'temp_run.cpp');
-                const tempExe = path.join(__dirname, 'temp_run.exe');
-
                 // Clean up previous files if they exist
-                if (fs.existsSync(tempCpp)) fs.unlinkSync(tempCpp);
-                if (fs.existsSync(tempExe)) fs.unlinkSync(tempExe);
+                if (fs.existsSync(TEMP_CPP)) fs.unlinkSync(TEMP_CPP);
+                if (fs.existsSync(TEMP_EXE)) fs.unlinkSync(TEMP_EXE);
 
-                fs.writeFile(tempCpp, code, (err) => {
+                fs.writeFile(TEMP_CPP, code, (err) => {
                     if (err) {
                         res.writeHead(500, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ error: 'Failed to write temp source file' }));
@@ -129,17 +134,15 @@ const server = http.createServer((req, res) => {
                     }
 
                     // Compile with g++
-                    const compileEnv = { ...process.env };
-                    compileEnv.PATH = (compileEnv.PATH || '') + ';' + GCC_BIN_DIR;
-
-                    const compile = spawn('g++', ['-std=c++17', tempCpp, '-o', tempExe], { env: compileEnv });
+                    const childEnv = getChildEnv();
+                    const compile = spawn('g++', ['-std=c++17', TEMP_CPP, '-o', TEMP_EXE], { env: childEnv });
                     let compileErr = '';
 
                     compile.stderr.on('data', data => { compileErr += data; });
 
                     compile.on('close', compileCode => {
                         // Delete temp source file
-                        fs.unlink(tempCpp, () => {});
+                        fs.unlink(TEMP_CPP, () => {});
 
                         if (compileCode !== 0) {
                             res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -151,7 +154,7 @@ const server = http.createServer((req, res) => {
                         }
 
                         // Run executable
-                        const runProcess = spawn(tempExe, [], { env: compileEnv });
+                        const runProcess = spawn(TEMP_EXE, [], { env: childEnv });
                         let stdoutData = '';
                         let stderrData = '';
 
@@ -160,7 +163,7 @@ const server = http.createServer((req, res) => {
 
                         runProcess.on('close', runCode => {
                             // Delete executable file
-                            fs.unlink(tempExe, () => {});
+                            fs.unlink(TEMP_EXE, () => {});
 
                             res.writeHead(200, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({

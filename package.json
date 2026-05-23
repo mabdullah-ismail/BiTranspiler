@@ -1,0 +1,15 @@
+{
+  "name": "bitranspiler",
+  "version": "1.0.0",
+  "description": "Bidirectional C++ and x86 MASM Assembly Transpiler",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "g++ -std=c++17 -O2 -o BiTranspiler src/main.cpp src/lexer/CppLexer.cpp src/lexer/AsmLexer.cpp src/parser/CppParser.cpp src/parser/AsmParser.cpp src/codegen/AsmPrinter.cpp src/codegen/CppPrinter.cpp"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Muhammad Abdullah Ismail",
+  "license": "ISC"
+}
