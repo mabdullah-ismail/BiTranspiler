@@ -1,0 +1,158 @@
+
+Computer Organization & Assembly Language (COAL)
+ BiTranspiler 
+Assembly ↔ C++ Bidirectional Code Transpiler
+Semester Project Proposal
+
+Course
+Computer Organization & Assembly Language (COAL)
+Submitted To
+Course Instructor
+Institution
+University — Department of Computer Science
+Semester
+Spring 2025
+Primary Language
+C++ with x86 MASM Assembly
+Tools / IDE
+Visual Studio 2022, MASM32 SDK
+Submitted By
+Muhammad Abdullah Ismail  |  F2024-0305
+Mahira Ali | F2024-0144
+
+1.  Project Overview & Objectives
+BiTranspiler is a bidirectional code transpilation tool that converts x86 Assembly (MASM syntax) to readable C++ and C++ back to x86 Assembly. Built entirely in C++, it demonstrates a thorough understanding of how low-level instructions map to high-level constructs — the central insight of the COAL course.
+
+Objectives
+Convert a defined subset of x86 MASM instructions into equivalent, commented C++ code
+Convert core C++ constructs (variables, arithmetic, if/else, loops, functions) into MASM Assembly
+Provide a clean terminal UI with a conversion summary, warnings, and formatted output files
+Demonstrate COAL concepts — registers, stack, flags, control flow, and procedure calls — through implementation
+
+2.  Scope — Supported Constructs
+Category
+Assembly Instructions
+C++ Equivalent
+Data Movement
+MOV, PUSH, POP, XCHG
+Variable assignment, function arguments
+Arithmetic
+ADD, SUB, MUL, DIV, INC, DEC, NEG
+Operators: +  −  *  /  ++  −−
+Bitwise / Logical
+AND, OR, XOR, NOT, SHL, SHR
+Operators: &  |  ^  ~  <<  >>
+Comparison & Branch
+CMP, JE, JNE, JG, JL, JGE, JLE, JMP
+if / else / while / for
+Procedures
+CALL, RET, PROC, ENDP
+Function definition and calls
+Loops
+LOOP, DEC+JNZ pattern
+for / while loops
+
+Out of scope: pointers, dynamic memory, classes/STL, floating-point (FPU/SSE), 64-bit registers, inline Assembly.
+
+3.  System Architecture
+Both conversion directions follow the same three-stage pipeline:
+
+Stage
+ASM → C++ Pipeline
+C++ → ASM Pipeline
+1. Lexer
+Tokenize .asm file — instructions, registers, labels, operands
+Tokenize .cpp file — keywords, identifiers, operators, literals
+2. Parser
+Recognize multi-line patterns (CMP+JE = if, DEC+JNZ = loop, CALL/RET = function)
+Parse expressions and control-flow structures into an IR tree
+3. Code Gen
+Emit formatted, commented C++ — registers mapped to variable names
+Emit formatted MASM Assembly with labels, PROCs, and comments
+
+A Warning Engine runs alongside both pipelines, logging any unrecognized patterns as comments in the output rather than failing. A main menu ties both pipelines together with file I/O and a conversion summary report.
+
+4.  Technologies & Tools
+Tool / Technology
+Version
+Role in Project
+C++
+C++17
+Core implementation — all modules written in C++
+x86 MASM Assembly
+32-bit MASM
+Source and target Assembly dialect
+Visual Studio
+Community 2022
+Primary IDE, debugger, MASM integration
+MASM32 SDK v11
+32-bit
+Assembling and testing generated .asm files
+STL (fstream, map, regex)
+Standard
+File I/O, data structures, pattern matching
+Git / GitHub
+Latest
+Version control and team collaboration
+
+5.  Deliverables
+Deliverable
+Description
+BiTranspiler Executable (.exe)
+Compiled application with full terminal menu UI
+ASM → C++ Converter (source)
+Lexer, Parser, Code Generator for decompiler direction
+C++ → ASM Converter (source)
+Lexer, Parser, Code Generator for compiler direction
+Test Files (.asm and .cpp)
+Sample inputs covering all supported constructs
+Generated Output Samples
+Example .cpp and .asm outputs showing conversion quality
+GitHub Repository
+Full organized source with README and setup instructions
+Final Report + User Manual
+Implementation details, test results, usage guide
+
+6.  Timeline
+Day
+Focus
+Tasks
+Day 1
+Setup + Lexer
+Install Visual Studio + MASM32, set up GitHub repo, write C++ Lexer — tokenize keywords, operators, identifiers, literals
+Day 2
+C++ → ASM
+Build Parser + Code Generator for C++ → ASM; handle variables, arithmetic, if/else, loops, functions
+Day 3
+ASM → C++
+Write ASM Lexer + Pattern Matcher; map MOV/CMP+JE/CALL/RET to C++ constructs
+Day 4
+Integration
+Connect both pipelines to main menu, add file I/O, build Warning Engine, show conversion summary
+Day 5
+Testing
+Write 5–6 test cases per direction, fix edge cases, ensure clean indented output
+Day 6
+Polish + Demo
+Improve terminal UI, add output comments, prepare demo input files, write GitHub README
+Day 7
+Report + Viva
+Write final report, prepare viva answers, rehearse demo, push final code to GitHub
+
+7.  Real-World Applications
+Education
+Professors can use BiTranspiler to show C++ students the exact Assembly equivalent of their code — making low-level concepts immediately tangible
+Assembly students can verify their logic by seeing the C++ translation of what they wrote
+Instructors can generate exam questions: show one side, ask students to produce the other
+Reverse Engineering & Security
+Security analysts examining binaries can convert known Assembly patterns to C++ quickly, speeding up manual code review
+Malware analysts can use the C++ output as a readable starting point for understanding Assembly routines
+Embedded Systems & Legacy Code
+Embedded developers can document Assembly-written routines in C++ for team members who are not Assembly-fluent
+Legacy Assembly codebases can be partially transpiled to C++ to aid understanding before refactoring
+Developer Tools
+BiTranspiler demonstrates the same architecture as professional tools (Compiler Explorer, Ghidra, IDA Pro) at a teachable scale — making it a reference project for future Compiler Design coursework
+
+8.  Conclusion
+BiTranspiler is an original, technically ambitious project that goes beyond implementing Assembly , it requires understanding how both languages relate at a structural level, which is the deepest insight the COAL course develops. It has clear deliverables, a realistic 7-day timeline, genuine real-world value, and produces a compelling interactive demo. We respectfully submit this proposal for approval.
+ 

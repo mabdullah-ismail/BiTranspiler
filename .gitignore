@@ -1,0 +1,23 @@
+# Compiled executables
+*.exe
+!BiTranspiler.exe
+*.obj
+*.o
+
+# Node.js
+node_modules/
+
+# Temp files from the Run API
+temp_run.cpp
+temp_run.exe
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE files
+.vs/
+.vscode/
+*.suo
+*.user

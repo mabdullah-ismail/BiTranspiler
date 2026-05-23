@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiTranspiler — C++ ↔ x86 MASM Assembly</title>
+    <meta name="description" content="Bidirectional transpiler between C++17 and 32-bit x86 MASM Assembly. Write, translate, and run code in real time.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">
+                    <span class="logo-icon">⟨⟩</span>
+                    <h1>BiTranspiler</h1>
+                </div>
+                <span class="version-tag">COAL Lab Project</span>
+            </div>
+            <div class="top-bar-right">
+                <button id="btn-tutorial" class="toolbar-btn" title="Restart Quick Tour Tutorial">
+                    <span class="tb-icon">?</span>
+                    Quick Tour
+                </button>
+                <button id="btn-docs" class="toolbar-btn" title="View Project Scope and FAQs">
+                    <span class="tb-icon">📄</span>
+                    Docs & FAQs
+                </button>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <label for="template-select" class="toolbar-label">Template</label>
+                <select id="template-select" class="dropdown">
+                    <option value="" disabled selected>Choose a program…</option>
+                    <option value="arithmetic">Arithmetic Operations</option>
+                    <option value="factorial">Factorial (Loops & Stack)</option>
+                    <option value="fibonacci">Fibonacci (Conditions)</option>
+                </select>
+            </div>
+            <div class="toolbar-actions">
+                <button id="btn-cpp-to-asm" class="action-btn action-transpile" title="Translate C++ to Assembly">
+                    Transpile →
+                </button>
+                <button id="btn-asm-to-cpp" class="action-btn action-recover" title="Translate Assembly to C++">
+                    ← Recover
+                </button>
+                <button id="btn-run-cpp" class="action-btn action-run" title="Compile & Run C++ Code">
+                    ▶ Run
+                </button>
+                <div class="toolbar-separator"></div>
+                <button id="clear-editors" class="action-btn action-clear" title="Clear both editors">Clear</button>
+            </div>
+        </div>
+
+        <!-- Workspace -->
+        <main class="workspace">
+            <!-- C++ Editor -->
+            <div class="editor-pane">
+                <div class="pane-header">
+                    <span class="pane-dot dot-cpp"></span>
+                    <h2>C++ Source</h2>
+                    <span class="badge">C++17</span>
+                </div>
+                <div class="editor-wrapper">
+                    <textarea id="cpp-editor" spellcheck="false" placeholder="// Write your C++ code here&#10;&#10;int main() {&#10;    int a = 10;&#10;    int b = 20;&#10;    return a + b;&#10;}"></textarea>
+                </div>
+            </div>
+
+            <!-- Assembly Editor -->
+            <div class="editor-pane">
+                <div class="pane-header">
+                    <span class="pane-dot dot-asm"></span>
+                    <h2>x86 MASM Assembly</h2>
+                    <span class="badge">32-bit</span>
+                </div>
+                <div class="editor-wrapper">
+                    <textarea id="asm-editor" spellcheck="false" placeholder="; Write your x86 MASM Assembly here&#10;&#10;.386&#10;.model flat, stdcall&#10;.stack 4096&#10;ExitProcess PROTO, dwExitCode:DWORD"></textarea>
+                </div>
+            </div>
+        </main>
+
+        <!-- Output Panels -->
+        <footer class="output-area">
+            <!-- Transpilation Logs -->
+            <div class="output-pane">
+                <div class="output-header">
+                    <div class="output-title">
+                        <span class="prompt-char">$</span>
+                        <h3>Transpilation Log</h3>
+                    </div>
+                    <button id="clear-console" class="link-btn">clear</button>
+                </div>
+                <div class="output-log" id="console-logs">
+                    <div class="log-entry system-msg">[ready] BiTranspiler loaded. Waiting for input.</div>
+                </div>
+            </div>
+
+            <!-- Program Output -->
+            <div class="output-pane">
+                <div class="output-header">
+                    <div class="output-title">
+                        <span class="prompt-char run-prompt">▶</span>
+                        <h3>Program Output</h3>
+                    </div>
+                    <button id="clear-output" class="link-btn">clear</button>
+                </div>
+                <div class="output-log" id="run-output">
+                    <div class="log-entry system-msg">[ready] Click "Run" to compile and execute your C++ code.</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden actions panel for JS compatibility -->
+    <div class="actions-panel" style="display:none;"></div>
+
+    <!-- Quick Tour Tutorial Modal -->
+    <div id="tutorial-modal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Welcome to BiTranspiler</h2>
+                <button id="close-tutorial" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body" style="padding-bottom: 1.5rem;">
+                <!-- Slide 1 -->
+                <div class="t-slide active" id="t-slide-1">
+                    <h3>What does this do?</h3>
+                    <p class="slide-text">
+                        BiTranspiler translates code between <strong>C++17</strong> and <strong>32-bit x86 MASM Assembly</strong> — in both directions. It preserves your variables, loops, branches, and function frames through a shared AST engine.
+                    </p>
+                    <div class="flow-diagram">
+                        <span class="block-node node-cpp">C++ Code</span>
+                        <span class="flow-arrow">⇄</span>
+                        <span class="block-node node-ast">AST Engine</span>
+                        <span class="flow-arrow">⇄</span>
+                        <span class="block-node node-asm">MASM Assembly</span>
+                    </div>
+                </div>
+                
+                <!-- Slide 2 -->
+                <div class="t-slide" id="t-slide-2">
+                    <h3>C++ Writing Guidelines</h3>
+                    <p class="slide-text">
+                        Keep your C++ code within these constraints for clean compilation:
+                    </p>
+                    <ul class="tut-list">
+                        <li><strong>Entry Point:</strong> Always declare <code>int main() { ... }</code>.</li>
+                        <li><strong>Variables:</strong> Declared as local <code>int</code> or <code>char</code> before usage.</li>
+                        <li><strong>Conditionals:</strong> Supports nested <code>if</code> and <code>if-else</code> structures.</li>
+                        <li><strong>Loops:</strong> Write standard <code>while</code> loops or basic <code>for</code> loops.</li>
+                        <li><strong>Exits & Output:</strong> Returns display as the <strong>Exit Code</strong>. Standard output streams (<code>cout</code> or <code>printf</code>) print directly to the run log pane during C++ execution.</li>
+                    </ul>
+                </div>
+                
+                <!-- Slide 3 -->
+                <div class="t-slide" id="t-slide-3">
+                    <h3>x86 MASM Writing Guidelines</h3>
+                    <p class="slide-text">
+                        Ensure your assembly adheres to this layout for clean recovery to C++:
+                    </p>
+                    <ul class="tut-list">
+                        <li><strong>Header Directives:</strong> Include <code>.386</code>, <code>.model flat, stdcall</code>, and <code>ExitProcess PROTO</code> at the top.</li>
+                        <li><strong>Data Segment:</strong> Define global variables inside <code>.data</code> using <code>DD</code> (for <code>int</code>) or <code>DB</code> (for <code>char</code>).</li>
+                        <li><strong>Procedures:</strong> Wrap statements in procedure frames (e.g. <code>main PROC</code> ... <code>main ENDP</code>). Use <code>LOCAL var:DWORD</code> for local scopes.</li>
+                        <li><strong>Exiting:</strong> Terminate execution with <code>invoke ExitProcess, eax</code>.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tutorial-footer">
+                <div class="slide-dots">
+                    <span class="dot active" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                    <span class="dot" data-slide="3"></span>
+                </div>
+                <div class="tutorial-nav-buttons">
+                    <button id="btn-tut-prev" class="link-btn" style="display: none; font-weight: 600; font-size: 0.9rem; padding: 0.5rem 1rem;">Back</button>
+                    <button id="btn-tut-next" class="action-btn action-transpile" style="margin-left: 0; padding: 0.45rem 1.2rem;">Next</button>
+                    <button id="btn-tut-start" class="action-btn action-run" style="display: none; margin-left: 0; padding: 0.45rem 1.2rem;">Start Coding</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Docs & FAQs Modal -->
+    <div id="docs-modal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Reference Guide</h2>
+                <button id="close-modal" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button id="tab-scope" class="tab-btn active">Project Scope</button>
+                <button id="tab-faq" class="tab-btn">FAQs</button>
+            </div>
+            <div class="modal-body">
+                <div id="content-scope" class="tab-content">
+                    <h3>Supported Features</h3>
+                    <ul>
+                        <li><strong>Primitive Variable Types:</strong> Translates C++ local <code>int</code> and <code>char</code> variable declarations to MASM <code>DD</code> and <code>DB</code> directives.</li>
+                        <li><strong>Arithmetic Expressions:</strong> Fully recovers operations for addition (<code>+</code>), subtraction (<code>-</code>), multiplication (<code>*</code>), and division (<code>/</code>). Handles CDQ and IDIV assembly instructions recursively.</li>
+                        <li><strong>Control Flow Recovery:</strong> Translates flat label jumps back into structured C++ <code>if</code>, <code>if-else</code>, <code>while</code> loops, and standard <code>for</code> loops.</li>
+                        <li><strong>Procedures & Scopes:</strong> Supports multiple function definitions (PROC) targeting stack frame parameter allocations and local variables (<code>LOCAL</code>).</li>
+                        <li><strong>Calling Conventions:</strong> Implements the <strong>Stdcall</strong> calling convention for x86 architecture, returning outputs in <code>EAX</code> and handling exits using <code>ExitProcess</code>.</li>
+                    </ul>
+                    <h3>Out of Scope</h3>
+                    <ul>
+                        <li>Pointers, references, and dynamic memory allocations (e.g. <code>new</code>, <code>delete</code>, heap usage).</li>
+                        <li>High-level C++ standard library structures (e.g. <code>std::vector</code>, <code>std::string</code>).</li>
+                        <li>Object-Oriented Programming constructs (e.g. classes, inheritance, objects).</li>
+                    </ul>
+                </div>
+                
+                <div id="content-faq" class="tab-content hidden">
+                    <div class="faq-item">
+                        <h4>Q1: How does the transpiler recover structured blocks (like if-conditions or loops) from raw assembly JMPs?</h4>
+                        <p><strong>Answer:</strong> The transpiler parses the MASM stream to identify JMP patterns. A backward JMP to a previous label marks a loop boundary, which gets parsed into a C++ <code>while</code> or <code>for</code> loop. Branching targets from conditional JMPs (like <code>JE</code>, <code>JNE</code>, <code>JG</code>, <code>JL</code>) denote <code>then</code> and <code>else</code> blocks. These blocks are recovered and mapped directly to C++ <code>IfNode</code> or <code>WhileNode</code> syntax elements in the AST.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Q2: Why do registers (like <code>eax</code> or <code>ebx</code>) sometimes appear as local variables in the recovered C++ code?</h4>
+                        <p><strong>Answer:</strong> In order to guarantee compile-readiness, any register operations that cannot be safely collapsed into general C++ operators by the peephole optimizer are mapped directly to local C++ variables (e.g., <code>int eax = 0;</code>). This preserves register assignment logic. Whenever possible, however, standard instruction sequences (like <code>mov eax, a; add eax, b; mov sum, eax</code>) are simplified to high-level math statements (like <code>sum = a + b;</code>).</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Q3: What assembly architecture and convention are used?</h4>
+                        <p><strong>Answer:</strong> It targets <strong>32-bit x86 MASM Assembly</strong>. The targeted calling convention is <strong>Stdcall</strong>, where function arguments are pushed onto the stack right-to-left, and returning integer values are placed inside the <code>EAX</code> register.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Q4: Why does Assembly use <code>ExitProcess</code> instead of returning?</h4>
+                        <p><strong>Answer:</strong> <code>ExitProcess</code> is a Win32 API function that terminates the execution of a process. In standard MASM, this functions as the final exit mechanism for the main execution frame. The recovery engine detects <code>invoke ExitProcess, eax</code> at the end of the entry procedure and correctly translates it back to a standard C++ <code>return eax;</code> inside <code>main()</code>.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Q5: How is bidirectional translation achieved under the hood?</h4>
+                        <p><strong>Answer:</strong> The system shares a common <strong>Abstract Syntax Tree (AST)</strong> representation. The C++ parser maps C++ tokens into AST nodes, which the Assembly code-generator prints. Conversely, the Assembly parser maps MASM instructions into the same AST nodes, allowing the C++ printer to emit clean C++. This shared AST ensures logical alignment between both environments.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Q6: How can I see the execution output of my code?</h4>
+                        <p><strong>Answer:</strong> There are two main ways to see execution outputs:
+                        <br>1. <strong>Exit Code (Recommended for Transpilation):</strong> In both MASM and C++, return your final result from the <code>main</code> procedure/function (which corresponds to <code>invoke ExitProcess, eax</code> in Assembly). When run, this value is printed as the <strong>Exit Code</strong> in the run output pane.
+                        <br>2. <strong>Console Printing (C++ Runs):</strong> You can write standard C++ output statements like <code>cout &lt;&lt; sum &lt;&lt; endl;</code> or <code>printf("%d\n", sum);</code> in the C++ editor and click <strong>Run C++</strong>. The console output (stdout) will print directly into the run output pane.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
