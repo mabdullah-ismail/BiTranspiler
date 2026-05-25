@@ -1,12 +1,17 @@
-# BiTranspiler — Bidirectional C++ ↔ x86 MASM Assembly Transpiler
+#  BiTranspiler — Bidirectional C++ ↔ x86 MASM Assembly Transpiler
 
-A bidirectional transpiler that translates code between **C++17** and **32-bit x86 MASM Assembly** in both directions. Built as a COAL (Computer Organization and Assembly Language) lab project.
+[![Language](https://img.shields.io/badge/Language-C++17-blue.svg)](https://en.cppreference.com/w/cpp/17)
+[![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://microsoft.com)
+[![Assembler](https://img.shields.io/badge/Assembler-32--bit%20MASM-red.svg)](https://learn.microsoft.com/en-us/cpp/assembler/masm/microsoft-macro-assembler-reference)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+A high-performance bidirectional transpiler that seamlessly translates code between **C++17** and **32-bit x86 MASM Assembly** in both directions. Built as a foundational Computer Organization and Assembly Language (COAL) lab project.
 
 ---
 
-## Project Structure
+##  Project Structure
 
-```
+```text
 Coal Lab Project/
 ├── src/                          # C++ source code for the transpiler engine
 │   ├── main.cpp                  # CLI entry point (interactive menu)
@@ -14,14 +19,14 @@ Coal Lab Project/
 │   │   ├── AST.h                 # Abstract Syntax Tree node definitions
 │   │   └── Token.h               # Token types for both C++ and MASM
 │   ├── lexer/
-│   │   ├── CppLexer.cpp/h        # Tokenizer for C++ source code
-│   │   └── AsmLexer.cpp/h        # Tokenizer for MASM assembly code
+│   │   ├── CppLexer.cpp/.h       # Tokenizer for C++ source code
+│   │   └── AsmLexer.cpp/.h       # Tokenizer for MASM assembly code
 │   ├── parser/
-│   │   ├── CppParser.cpp/h       # C++ → AST parser
-│   │   └── AsmParser.cpp/h       # MASM → AST parser (with peephole optimizer)
+│   │   ├── CppParser.cpp/.h      # C++ → AST parser
+│   │   └── AsmParser.cpp/.h      # MASM → AST parser (with peephole optimizer)
 │   └── codegen/
-│       ├── AsmPrinter.cpp/h      # AST → MASM code generator
-│       └── CppPrinter.cpp/h      # AST → C++ code generator
+│       ├── AsmPrinter.cpp/.h     # AST → MASM code generator
+│       └── CppPrinter.cpp/.h     # AST → C++ code generator
 ├── public/                       # Web GUI frontend
 │   ├── index.html                # Main page
 │   ├── index.css                 # Stylesheet
@@ -37,133 +42,131 @@ Coal Lab Project/
 
 ---
 
-## How It Works
+##  How It Works
 
-The transpiler uses a **shared Abstract Syntax Tree (AST)** as the intermediate representation:
+The transpiler utilizes a **shared Abstract Syntax Tree (AST)** as its primary intermediate representation:
 
-```
+```text
 C++ Source Code  →  [CppLexer → CppParser]  →  AST  →  [AsmPrinter]  →  MASM Assembly
-MASM Assembly    →  [AsmLexer → AsmParser]  →  AST  →  [CppPrinter]  →  C++ Source Code
+MASM Assembly   →  [AsmLexer → AsmParser]  →  AST  →  [CppPrinter]  →  C++ Source Code
 ```
 
-**Key techniques:**
-- **Lexical analysis** tokenizes both C++ and MASM into a common token stream
-- **Recursive descent parsing** builds the AST from tokens
-- **Peephole optimization** in the ASM→C++ path eliminates redundant register variables
-- **Condition simplification** recovers clean `if (a > b)` from `cmp/setg/movzx/je` sequences
-- **Control flow recovery** maps flat JMP/label patterns back to structured `if`, `while`, `for` blocks
+### Key Compilation Techniques:
+* **Lexical Analysis:** Tokenizes both high-level C++ and low-level MASM constructs into a uniform token stream.
+* **Recursive Descent Parsing:** Efficiently maps language tokens directly into structural AST nodes.
+* **Peephole Optimization:** Cleans up the `ASM → C++` translation layer to eliminate redundant register variables.
+* **Condition Simplification:** Reconstructs intuitive code patterns like `if (a > b)` out of raw `cmp/setg/movzx/je` structural logic.
+* **Control Flow Recovery:** Formulates flat assembly jumps and labels back into standard structured `if`, `while`, and `for` control loops.
 
 ---
 
-## Supported Language Features
+##  Features Matrix
 
 | Feature | C++ → Assembly | Assembly → C++ |
-|---------|:-:|:-:|
-| Integer and char variables | ✓ | ✓ |
-| Arithmetic (+, -, *, /) | ✓ | ✓ |
-| Comparison operators (==, !=, <, >, <=, >=) | ✓ | ✓ |
-| Bitwise operators (&, \|, ^, ~, <<, >>) | ✓ | ✓ |
-| Logical operators (&&, \|\|, !) | ✓ | ✓ |
-| if / if-else statements | ✓ | ✓ |
-| while loops | ✓ | ✓ |
-| for loops | ✓ | ✓ |
-| Functions with parameters | ✓ | ✓ |
-| Function calls (stdcall) | ✓ | ✓ |
-| Global and local variables | ✓ | ✓ |
-| Return values via EAX | ✓ | ✓ |
+| :--- | :---: | :---: |
+| Integer and Char Variables | ✓ | ✓ |
+| Arithmetic Operators (`+`, `-`, `*`, `/`) | ✓ | ✓ |
+| Comparison Operators (`==`, `!=`, `<`, `>`, `<=`, `>=`) | ✓ | ✓ |
+| Bitwise Operators (`&`, `\|`, `^`, `~`, `<<`, `>>`) | ✓ | ✓ |
+| Logical Operators (`&&`, `\|\|`, `!`) | ✓ | ✓ |
+| `if` / `if-else` Statements | ✓ | ✓ |
+| `while` Loops | ✓ | ✓ |
+| `for` Loops | ✓ | ✓ |
+| Functions with Parameters | ✓ | ✓ |
+| Function Calls (`stdcall`) | ✓ | ✓ |
+| Global and Local Variables | ✓ | ✓ |
+| Return Values via `EAX` Register | ✓ | ✓ |
 
 ---
 
-## Prerequisites
+##  Prerequisites
 
-To **build from source**, you need one of:
-- **Microsoft Visual Studio 2022** (with "Desktop Development with C++" workload)
-- **MinGW / GCC** (g++ with C++17 support)
+### To Build from Source:
+* **Microsoft Visual Studio 2022** (with the *"Desktop Development with C++"* workload configured) **OR**
+* **MinGW / GCC** (with explicit `g++` C++17 language support)
 
-To **run the web GUI**, you need:
-- **Node.js** (v18 or later)
-- A C++ compiler accessible from PATH (for the "Run C++" feature)
+### To Run the Web GUI:
+* **Node.js** (v18 or newer installed)
+* A valid C++ compiler exposed to your system environment variables (`PATH`) to enable the "Run C++" interface execution feature.
 
-> **Note:** A pre-built `BiTranspiler.exe` is included, so you can skip the build step if you just want to run it.
+>  **Note:** A pre-built `BiTranspiler.exe` binary is shipped out of the box. You can skip explicit compilation phases if you wish to run the app directly.
 
 ---
 
+## 📖 Usage Guide
 
-
-The CLI provides an interactive menu:
-1. **C++ --> Assembly** — Paste your C++ code, type `END` on a new line, get Assembly output
-2. **Assembly --> C++** — Paste your MASM Assembly, type `END` on a new line, get C++ output
+### Using the CLI Interface
+Running the engine directly launches an interactive command-line interface terminal wizard:
+1. **C++ --> Assembly** — Paste target C++ block logic, enter `END` on a completely new terminal line, and receive generated MASM output.
+2. **Assembly --> C++** — Paste system MASM code blocks, enter `END` on a completely new terminal line, and receive structured C++ output code.
 3. **Exit**
 
-The executable also supports **pipe mode** for automation:
+### Automation Pipe Mode
+The backend executable fully supports standard input/output streaming redirection pipelines:
 ```bash
 BiTranspiler.exe --cpp2asm < input.cpp > output.asm
 BiTranspiler.exe --asm2cpp < input.asm > output.cpp
 ```
 
-### Building from Source
-
+### Building From Source
+To trigger the automated build ecosystem configuration pipeline run:
 ```bash
-# Run the build script (auto-detects MSVC or GCC)
+# Triggers internal automated architecture build discovery matching MSVC or GCC
 build.bat
 ```
 
 ---
 
-## Test Cases
+##  Test Case Suite
 
-The `tests/` directory contains verified input/output pairs:
+The local `tests/` path maps out verified diagnostic input-to-output coverage pairings:
 
-| Test | Input | Transpiled Output | Recovered C++ |
-|------|-------|-------------------|---------------|
-| Arithmetic | `test1_arithmetic.cpp` | `test1_arithmetic_out.asm` | `test1_arithmetic_recovered.cpp` |
-| Factorial | `test2_factorial.cpp` | `test2_factorial_out.asm` | `test2_factorial_recovered.cpp` |
-| Fibonacci | `test3_fibonacci.cpp` | `test3_fibonacci_out.asm` | `test3_fibonacci_recovered.cpp` |
+| Test Module Target | Input Source File | Transpiled Output Generation | Recovered Level Output |
+| :--- | :--- | :--- | :--- |
+| **Arithmetic** | `test1_arithmetic.cpp` | `test1_arithmetic_out.asm` | `test1_arithmetic_recovered.cpp` |
+| **Factorial** | `test2_factorial.cpp` | `test2_factorial_out.asm` | `test2_factorial_recovered.cpp` |
+| **Fibonacci** | `test3_fibonacci.cpp` | `test3_fibonacci_out.asm` | `test3_fibonacci_recovered.cpp` |
 
 ---
 
-## Architecture
+##  Architecture Blueprint
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Web GUI (Browser)                        │
-│   index.html + index.css + index.js                             │
+│               index.html + index.css + index.js                 │
 │   Editors │ Templates │ Run Output │ Tutorial │ FAQs            │
 └──────────────────────────┬──────────────────────────────────────┘
                            │ HTTP POST /api/transpile
                            │ HTTP POST /api/run
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Node.js Server (server.js)                   │
+│                 Node.js Server (server.js)                      │
 │   Static file serving │ Transpile API │ Compile & Run API       │
 └──────────────────────────┬──────────────────────────────────────┘
                            │ stdin/stdout pipe
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                  BiTranspiler.exe (C++ Engine)                   │
+│                 BiTranspiler.exe (C++ Engine)                   │
 │                                                                 │
 │  ┌───────────┐    ┌───────────┐    ┌────────────────────────┐   │
 │  │ CppLexer  │───▶│ CppParser │───▶│                        │   │
-│  └───────────┘    └───────────┘    │    Shared AST           │   │
-│                                    │    (Abstract Syntax     │   │
-│  ┌───────────┐    ┌───────────┐    │     Tree)               │   │
+│  └───────────┘    └───────────┘    │        Shared AST      │   │
+│                                    │    (Abstract Syntax    │   │
+│  ┌───────────┐    ┌───────────┐    │         Tree)          │   │
 │  │ AsmLexer  │───▶│ AsmParser │───▶│                        │   │
 │  └───────────┘    └───────────┘    └──────────┬─────────────┘   │
 │                                               │                 │
 │                              ┌────────────────┴──────────┐      │
 │                              ▼                           ▼      │
-│                        ┌───────────┐              ┌───────────┐ │
-│                        │AsmPrinter │              │CppPrinter │ │
-│                        └───────────┘              └───────────┘ │
+│                        ┌───────────┐               ┌───────────┐│
+│                        │AsmPrinter │               │CppPrinter ││
+│                        └───────────┘               └───────────┘│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Author
+##  Author
 
-Muhammad Abdullah Ismail
-
----
-
-
+* **Muhammad Abdullah Ismail** — *Core Architecture & Design Implementation*
