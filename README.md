@@ -170,3 +170,4 @@ The local `tests/` path maps out verified diagnostic input-to-output coverage pa
 ##  Author
 
 * **Muhammad Abdullah Ismail** — *Core Architecture & Design Implementation*
+* **Mahira Ali** - Frontend & Hosting
